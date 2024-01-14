@@ -2,17 +2,38 @@ import React, { useState } from 'react';
 import Header from './Header';
 import { useRef } from 'react';
 import { validateLoginData } from '../utils/validator';
+import { auth } from "../utils/firebase"
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    const [validateMessage, setValidateMessage] = useState(null);
+    const [validateMessage, setErrorMessage] = useState(null);
     const email = useRef(null);
     const password = useRef(null);
+    const navigate = useNavigate();
 
     const loginButtonHandler = () => {
         const message = validateLoginData(email.current.value, password.current.value);
-        setValidateMessage(message);
-    }
+        setErrorMessage(message);
+        if(message) return;
 
+        signInWithEmailAndPassword(
+            auth,
+            email.current.value,
+            password.current.value
+          )
+            .then((userCredential) => {
+              // Signed in
+              const user = userCredential.user;
+              console.log(user);
+              navigate("/browse");
+            })
+            .catch((error) => {
+              const errorCode = error.code;
+              const errorMessage = error.message;
+              setErrorMessage(errorCode + "-" + errorMessage);
+            });
+        }
     return (
         <div>
             <Header />
@@ -24,27 +45,27 @@ const Login = () => {
             </div>
             <form onSubmit={(e) => e.preventDefault()} className='absolute w-3/12 p-12 my-36 mx-auto right-0 left-0 bg-black text-white rounded-lg bg-opacity-85'>
                 <h1 className='font-bold text-3xl py-4 '> Sign In</h1>
-                <div className='text-red-600 text-xl pt-5 pb-3'>
+                { validateMessage != null ? <div className='text-red-600 text-xl pt-5 pb-3 font-bold'>
                     <span> {validateMessage} </span>
-                </div>
+                </div>: ""}
 
                 <input 
                     ref = {email}
                     type="text"
                     placeholder='Email Address' 
-                    className='p-4 my-2 w-full rounded-md text-black'
+                    className='p-3 my-2 w-full rounded-md text-black bg-gray-300'
                 />
                 <input 
                     ref = {password}
                     type="password" 
                     placeholder='Password' 
-                    className='p-4 my-2 w-full rounded-md text-black'
+                    className='p-3 my-2 w-full rounded-md text-black bg-gray-300'
                 />
                 <button 
-                    className='p-4 my-8 bg-red-600 w-full rounded-md'
+                    className='p-3 my-8 bg-red-600 w-full rounded-md font-bold'
                     onClick={loginButtonHandler}
                 > 
-                Sign IN 
+                Sign In
                 </button>
                 
                 <div className='mt-16'>
