@@ -26,7 +26,7 @@ const Header = () => {
         navigate("/browse");
       } else {
         dispatch(removeUser());
-        if(window.location.href.includes("/signup")) {
+        if (window.location.href.includes("/signup")) {
           navigate("/signup")
         } else {
           navigate("/");
@@ -39,22 +39,26 @@ const Header = () => {
 
   const handleSignOut = () => {
     signOut(auth)
-      .then(() => {})
+      .then(() => { })
       .catch((error) => {
         navigate("/error");
       });
   };
-  
+
   return (
-    <div className="absolute w-screen px-8 py-2 bg-gradient-to-b from-black z-10 flex justify-between">
+    <div className="absolute w-screen px-8 py-2 bg-gradient-to-b from-black z-10 flex flex-col md:flex-row justify-between">
       <img
         className='w-48'
-        src= {LOGO}
+        src={LOGO}
         alt='logo'
       />
       {user && (
         <div className="flex p-2">
-          <img className="w-12 h-12" alt="usericon" src={user?.photoURL} />
+          <img
+            className="hidden md:block w-12 h-12"
+            alt="usericon"
+            src={user?.photoURL}
+          />
           <button onClick={handleSignOut} className="font-bold text-white ">
             (Sign Out)
           </button>
